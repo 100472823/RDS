@@ -7,6 +7,10 @@ from mininet.node import RemoteController, OVSSwitch
 from functools import partial
 
 
+
+
+
+
 class Hito1Topo(Topo):
     'My single switch connected to n hosts.'
 
@@ -18,15 +22,10 @@ class Hito1Topo(Topo):
         self.addLink(host1, switch, intfName2='s1-eth1')
         self.addLink(host2, switch, intfName2='s1-eth2')
 
+
 def configureStaticARP(host, ip, mac):
     # Establecer una entrada ARP estática en el host
     host.setARP(ip=ip, mac=mac)
-
-
-def configureStaticARPs(net):
-    # Configurar entradas ARP estáticas en ambos hosts
-    configureStaticARP(net.get('h1'), ip='10.0.1.2', mac='70:88:99:00:00:01')
-    configureStaticARP(net.get('h2'), ip='10.0.0.1', mac='70:88:99:00:00:01')
 
 
 
@@ -35,6 +34,10 @@ def simpleTestCLI():
     topo = Hito1Topo(4)
     net = Mininet(topo,controller=partial(RemoteController, ip="127.0.0.1"),switch=partial(OVSSwitch, protocols="OpenFlow13"))
     net.start()
+    h1 = net.get("h1")
+    h2 = net.get("h2")
+    configureStaticARP(h1,ip='10.0.0.1', mac='70:88:99:00:00:01')
+    configureStaticARP(h2,ip='10.0.1.1',mac='70:88:99:10:00:02' )
     CLI(net)
     net.stop()
 
@@ -43,3 +46,10 @@ if __name__ == '__main__':
     # Tell mininet to print useful information
     setLogLevel('info')
     simpleTestCLI()
+
+
+
+
+
+
+
