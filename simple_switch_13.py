@@ -48,6 +48,18 @@ class SimpleSwitch13(app_manager.RyuApp):
                                           ofproto.OFPCML_NO_BUFFER)]
         self.add_flow(datapath, 0, match, actions)
 
+
+        match = parser.OFPMatch(eth_type=ether_types.ETH_TYPE_IP, ipv4_dst=('10.0.0.0', '255.255.255.0'))
+        actions = self.fordwardActions(parser, ofproto,1,'00:00:00:00:00:02', '70:88:99:10:00:02')
+        self.add_flow(datapath,1000,match, actions)
+    
+        match = parser.OFPMatch(eth_type=ether_types.ETH_TYPE_IP, ipv4_dst=('10.0.1.0', '255.255.255.0'))
+        actions = self.fordwardActions(parser, ofproto,1,'00:00:00:00:00:01', '70:88:99:00:00:01')
+        self.add_flow(datapath,1000,match, actions)
+    
+      
+
+
     def add_flow(self, datapath, priority, match, actions, buffer_id=None):
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
