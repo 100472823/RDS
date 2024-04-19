@@ -14,7 +14,7 @@ from functools import partial
 class Hito1Topo(Topo):
     'My single switch connected to n hosts.'
 
-    def build(self, N=2):
+    def build(self):
             switch = self.addSwitch('s1')
             host1 = self.addHost('h1', ip='10.0.0.2/24', mac='00:00:00:00:00:01')
             host2 = self.addHost('h2', ip='10.0.1.2/24', mac='00:00:00:00:00:02')
@@ -24,18 +24,13 @@ class Hito1Topo(Topo):
             self.addLink(host2, switch, intfName2='s1-eth2')
     
 
-def configureStaticARP(host, ip, mac):
-    # Establecer una entrada ARP estática en el host
-    host.setARP(ip=ip, mac=mac)
-
-
 
 
 def simpleTestCLI():
-    topo = Hito1Topo(4)
+    topo = Hito1Topo()
     net = Mininet(topo,controller=partial(RemoteController, ip="127.0.0.1"),switch=partial(OVSSwitch, protocols="OpenFlow13"))
     net.start()
-   
+    
    # s1 = net.get('s1')
    # s1.setIP('10.0.0.1/24', intf='s1-eth1')
    # s1.setMAC('70:88:99:00:00:01', intf='s1-eth1')
@@ -52,7 +47,7 @@ def simpleTestCLI():
 
     h1.setARP('10.0.0.1', '70:88:99:00:00:01')  # Establecer entrada ARP estática en h1 para h2
     h2.setARP('10.0.1.1', '70:88:99:10:00:02')  # Establecer entrada ARP estática en h2 para h1
-        
+
 
     CLI(net)
     net.stop()

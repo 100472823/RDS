@@ -29,13 +29,22 @@ class SimpleSwitch13(app_manager.RyuApp):
     def __init__(self, *args, **kwargs):
         super(SimpleSwitch13, self).__init__(*args, **kwargs)
         self.mac_to_port = {}
+        
+    def forwardActions(self, parser, ofproto, port, src, dst):    
+        return [  parser.OFPActionSetField(eth_src=src),
+        parser.OFPActionSetField(eth_dst=dst),
+        parser.OFPActionDecNwTtl(),
+        parser.OFPActionOutput(port),
+        ]
+        
+        def dropActions(self, parser, ofproto):
+            return [ ]
 
     @set_ev_cls(ofp_event.EventOFPSwitchFeatures, CONFIG_DISPATCHER)
     def switch_features_handler(self, ev):
         datapath = ev.msg.datapath
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
-
         # install table-miss flow entry
         #
         # We specify NO BUFFER to max_len of the output action due to
@@ -49,14 +58,17 @@ class SimpleSwitch13(app_manager.RyuApp):
 
 
         match = parser.OFPMatch(eth_type=ether_types.ETH_TYPE_IP, ipv4_dst=('10.0.0.0', '255.255.255.0'))
-        actions = self.fordwardActions(parser, ofproto,1,'70:88:99:00:00:01', '00:00:00:00:00:01')
+        actions = self.fordwardActions(parser, ofproto, 1,'70:88:99:00:00:01', '00:00:00:00:00:01')
         self.add_flow(datapath,1000,match, actions)
     
         match = parser.OFPMatch(eth_type=ether_types.ETH_TYPE_IP, ipv4_dst=('10.0.1.0', '255.255.255.0'))
-        actions = self.fordwardActions(parser, ofproto,2,'70:88:99:10:00:02', '00:00:00:00:00:02')
+        actions = self.fordwardActions(parser, ofproto, 1,'70:88:99:10:00:02', '00:00:00:00:00:02')
         self.add_flow(datapath,1000,match, actions)
+
+        #Falta que nos especifique que simplemente poniendo ethr_type, == ipv6, simplemente dejando acciones en blanco
+        #Se descartaria el paquete
     
-      
+       
 
 
     def add_flow(self, datapath, priority, match, actions, buffer_id=None):
